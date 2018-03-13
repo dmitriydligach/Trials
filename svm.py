@@ -26,8 +26,6 @@ warnings.warn = warn
 
 FEATURE_LIST = 'Model/features.txt'
 NUM_FOLDS = 10
-NGRAM_RANGE = (1, 1) # use unigrams for cuis
-MIN_DF = 0
 
 def nfold_cv_sparse(category):
   """Run n-fold CV on training set"""
@@ -46,9 +44,7 @@ def nfold_cv_sparse(category):
     alphabet_pickle=cfg.get('data', 'alphabet_pickle'))
   x, y = dataset.load_raw()
 
-  vectorizer = TfidfVectorizer(
-    ngram_range=NGRAM_RANGE,
-    min_df=MIN_DF)
+  vectorizer = TfidfVectorizer()
   tfidf_matrix = vectorizer.fit_transform(x)
 
   # print features to file for debugging
