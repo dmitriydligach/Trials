@@ -52,7 +52,7 @@ def nfold_cv_sparse(category):
   for feature in vectorizer.get_feature_names():
     feature_file.write(feature + '\n')
 
-  classifier = LinearSVC(class_weight='balanced', C=1)
+  classifier = LinearSVC(loss='hinge', class_weight='balanced', C=1)
   cv_scores = cross_val_score(
     classifier,
     tfidf_matrix,
