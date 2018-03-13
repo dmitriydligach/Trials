@@ -42,7 +42,7 @@ def nfold_cv_sparse(category):
     category,
     use_pickled_alphabet=False,
     alphabet_pickle=cfg.get('data', 'alphabet_pickle'))
-  x, y = dataset.load_raw()
+  x, y = dataset.load_for_sklearn()
 
   vectorizer = TfidfVectorizer()
   tfidf_matrix = vectorizer.fit_transform(x)

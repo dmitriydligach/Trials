@@ -67,7 +67,7 @@ class DatasetProvider:
     pickle_file = open(self.alphabet_pickle, 'wb')
     pickle.dump(self.token2int, pickle_file)
 
-  def load_raw(self):
+  def load_for_sklearn(self):
     """Load for sklearn training"""
 
     labels = []    # string labels
@@ -81,12 +81,46 @@ class DatasetProvider:
     for f in os.listdir(self.cui_dir):
       doc_id = f.split('.')[0]
       file_path = os.path.join(self.cui_dir, f)
-      file_feat_list = open(file_path).read()
+      file_as_string = open(file_path).read()
 
       string_label = doc2label[doc_id]
       int_label = LABEL2INT[string_label]
       labels.append(int_label)
-      examples.append(file_feat_list)
+      examples.append(file_as_string)
+
+    return examples, labels
+
+  def load_for_keras(self, maxlen=float('inf')):
+    """Convert examples into lists of indices for keras"""
+
+    labels = []    # int labels
+    examples = []  # examples as int sequences
+
+    # document number -> label mapping
+    doc2label = n2b2.map_patients_to_labels(
+      self.xml_dir,
+      self.category)
+
+    # load examples and labels
+    for f in os.listdir(self.cui_dir):
+      doc_id = f.split('.')[0]
+      file_path = os.path.join(self.cui_dir, f)
+      file_feat_list = open(file_path).read().split()
+
+      example = []
+      for token in set(file_feat_list):
+        if token in self.token2int:
+          example.append(self.token2int[token])
+        else:
+          example.append(self.token2int['oov_word'])
+
+      if len(example) > maxlen:
+        example = example[0:maxlen]
+
+      string_label = doc2label[doc_id]
+      int_label = LABEL2INT[string_label]
+      labels.append(int_label)
+      examples.append(example)
 
     return examples, labels
 
@@ -105,5 +139,5 @@ if __name__ == "__main__":
     use_pickled_alphabet=False,
     alphabet_pickle=cfg.get('data', 'alphabet_pickle'))
 
-  x, y = provider.load_raw()
-  print sum(y)
+  x, y = provider.load_for_keras()
+  print x[10]
