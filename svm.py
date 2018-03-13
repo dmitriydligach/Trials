@@ -63,6 +63,50 @@ def nfold_cv_sparse(category):
   print 'macro f1 (%s) = %.3f' % (category, numpy.mean(cv_scores))
   return numpy.mean(cv_scores)
 
+def nfold_cv_dense(category):
+  """Run n-fold CV on training set"""
+
+  cfg = ConfigParser.ConfigParser()
+  cfg.read(sys.argv[1])
+  base = os.environ['DATA_ROOT']
+  xml_dir = os.path.join(base, cfg.get('data', 'xml_dir'))
+  cui_dir = os.path.join(base, cfg.get('data', 'cui_dir'))
+
+  # load pre-trained model
+  model = load_model(cfg.get('data', 'model_file'))
+  interm_layer_model = Model(
+    inputs=model.input,
+    outputs=model.get_layer('HL').output)
+
+  dataset = DatasetProvider(
+    xml_dir,
+    cui_dir,
+    category,
+    use_pickled_alphabet=True,
+    alphabet_pickle=cfg.get('data', 'alphabet_pickle'))
+  x, y = dataset.load_for_keras()
+
+  classes = len(set(y))
+  print 'unique labels in train:', classes
+  maxlen = cfg.getint('data', 'maxlen')
+  x = pad_sequences(x, maxlen=maxlen)
+
+  # make training vectors for target task
+  print 'original x_train shape:', x.shape
+  x = interm_layer_model.predict(x)
+  print 'new x_train shape:', x.shape
+
+  classifier = LinearSVC(loss='hinge', class_weight='balanced', C=1)
+  cv_scores = cross_val_score(
+    classifier,
+    x,
+    y,
+    scoring='f1_macro',
+    cv=NUM_FOLDS)
+
+  print 'macro f1 (%s) = %.3f' % (category, numpy.mean(cv_scores))
+  return numpy.mean(cv_scores)
+
 def nfold_cv_sparse_all(eval_type):
   """Evaluate classifier performance for all 13 conditions"""
 
@@ -81,12 +125,12 @@ def nfold_cv_sparse_all(eval_type):
     if eval_type == 'sparse':
       # use bag-of-word vectors
       f1 = nfold_cv_sparse(category)
-    elif evaluation == 'svd':
+    elif eval_type == 'svd':
       # use low dimensional vectors obtained via svd
-      p, r, f1 = nfold_cv_svd(category)
+      f1 = nfold_cv_svd(category)
     else:
       # use learned patient vectors
-      p, r, f1 = nfold_cv_dense(disease, judgement)
+      f1 = nfold_cv_dense(category)
     f1s.append(f1)
 
   print '---------------------------'
@@ -94,4 +138,4 @@ def nfold_cv_sparse_all(eval_type):
 
 if __name__ == "__main__":
 
-  nfold_cv_sparse_all('sparse')
+  nfold_cv_sparse_all('dense')
