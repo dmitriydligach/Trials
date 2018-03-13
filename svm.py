@@ -46,10 +46,6 @@ def nfold_cv_sparse(category):
     alphabet_pickle=cfg.get('data', 'alphabet_pickle'))
   x, y = dataset.load_raw()
 
-  print 'category:', category
-  print y
-  print
-
   vectorizer = TfidfVectorizer(
     ngram_range=NGRAM_RANGE,
     min_df=MIN_DF)
@@ -81,6 +77,11 @@ def nfold_cv_sparse_all(eval_type):
 
   f1s = []
   for category in n2b2.get_category_names(xml_dir):
+
+    # weird sklearn bug - skip for now
+    if category == 'KETO-1YR':
+      continue
+
     if eval_type == 'sparse':
       # use bag-of-word vectors
       f1 = nfold_cv_sparse(category)
@@ -92,6 +93,7 @@ def nfold_cv_sparse_all(eval_type):
       p, r, f1 = nfold_cv_dense(disease, judgement)
     f1s.append(f1)
 
+  print '---------------------------'
   print 'average macro f1 = %.3f' % numpy.mean(f1s)
 
 if __name__ == "__main__":
