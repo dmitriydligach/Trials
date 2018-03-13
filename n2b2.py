@@ -36,7 +36,7 @@ def get_category_names(xml_dir):
         categories.append(category.tag)
     break
 
-  print categories
+  return categories
 
 def write_notes_to_files(xml_dir, out_dir):
   """Extract notes from xml and write to files"""
