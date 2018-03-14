@@ -4,6 +4,20 @@ import sys
 sys.dont_write_bytecode = True
 import xml.etree.ElementTree as et
 import os.path, glob, string
+from collections import Counter
+
+def generate_dataset_stats(xml_dir):
+  """Generate various descriptive stats for the dataset"""
+
+  for category in get_category_names(xml_dir):
+    doc2labels = map_patients_to_labels(xml_dir, category)
+    counts = Counter(doc2labels.values())
+    total = len(doc2labels)
+    met = counts['met']
+    print 'category:', category.lower()
+    print 'positive prevalence: %.1f%%' % \
+            (met * 100 / float(total))
+    print
 
 def map_patients_to_labels(xml_dir, category):
   """Get a patient number to label mapping"""
@@ -59,4 +73,4 @@ if __name__ == "__main__":
   xml_dir = '/Users/Dima/Loyola/Data/Trials/Xml/'
   out_dir = '/Users/Dima/Loyola/Data/Trials/Text/'
 
-  map_patients_to_labels(xml_dir, 'MAKES-DECISIONS')
+  generate_dataset_stats(xml_dir)
