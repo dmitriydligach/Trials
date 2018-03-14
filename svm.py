@@ -53,7 +53,7 @@ def nfold_cv_sparse(category):
   for feature in vectorizer.get_feature_names():
     feature_file.write(feature + '\n')
 
-  classifier = LinearSVC(loss='hinge', class_weight='balanced', C=1)
+  classifier = LinearSVC(class_weight='balanced', C=1)
   cv_scores = cross_val_score(
     classifier,
     tfidf_matrix,
@@ -105,12 +105,13 @@ def nfold_cv_dense(category):
   print 'macro f1 (%s) = %.3f' % (category, numpy.mean(cv_scores))
   return numpy.mean(cv_scores)
 
-def nfold_cv_sparse_all(eval_type):
+def nfold_cv_sparse_all():
   """Evaluate classifier performance for all 13 conditions"""
 
   cfg = ConfigParser.ConfigParser()
   cfg.read(sys.argv[1])
   base = os.environ['DATA_ROOT']
+  eval_type = cfg.get('args', 'eval_type')
   xml_dir = os.path.join(base, cfg.get('data', 'xml_dir'))
 
   f1s = []
@@ -123,17 +124,15 @@ def nfold_cv_sparse_all(eval_type):
     if eval_type == 'sparse':
       # use bag-of-word vectors
       f1 = nfold_cv_sparse(category)
-    elif eval_type == 'svd':
-      # use low dimensional vectors obtained via svd
-      f1 = nfold_cv_svd(category)
     else:
       # use learned patient vectors
       f1 = nfold_cv_dense(category)
+
     f1s.append(f1)
 
-  print '---------------------------'
+  print '--------------------------'
   print 'average macro f1 = %.3f' % numpy.mean(f1s)
 
 if __name__ == "__main__":
 
-  nfold_cv_sparse_all('dense')
+  nfold_cv_sparse_all()

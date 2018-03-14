@@ -34,7 +34,6 @@ class DatasetProvider:
     # when training, make alphabet and pickle it
     # when testing, load it from pickle
     if use_pickled_alphabet:
-      print 'reading alphabet from', alphabet_pickle
       pkl = open(alphabet_pickle, 'rb')
       self.token2int = pickle.load(pkl)
     else:
