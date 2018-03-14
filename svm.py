@@ -7,7 +7,7 @@ import sys
 sys.dont_write_bytecode = True
 import ConfigParser, os, pickle
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.svm import LinearSVC
+from sklearn.linear_model import LogisticRegression
 from sklearn.dummy import DummyClassifier
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import precision_score
@@ -53,7 +53,7 @@ def nfold_cv_sparse(category):
   for feature in vectorizer.get_feature_names():
     feature_file.write(feature + '\n')
 
-  classifier = LinearSVC(class_weight='balanced', C=1)
+  classifier = LogisticRegression(class_weight='balanced', C=1)
   cv_scores = cross_val_score(
     classifier,
     tfidf_matrix,
@@ -94,7 +94,7 @@ def nfold_cv_dense(category):
   # make training vectors for target task
   x = interm_layer_model.predict(x)
 
-  classifier = LinearSVC(class_weight='balanced', C=1)
+  classifier = LogisticRegression(class_weight='balanced', C=1)
   cv_scores = cross_val_score(
     classifier,
     x,
