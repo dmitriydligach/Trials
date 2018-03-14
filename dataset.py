@@ -8,9 +8,7 @@ import numpy, pickle
 import ConfigParser, os, nltk, pandas
 import glob, string, collections, operator
 
-# can be used to turn this into a binary task
 LABEL2INT = {'not met':0, 'met':1}
-# file to log alphabet entries for debugging
 ALPHABET_FILE = 'Model/alphabet.txt'
 
 class DatasetProvider:

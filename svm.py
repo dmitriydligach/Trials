@@ -8,6 +8,7 @@ sys.dont_write_bytecode = True
 import ConfigParser, os, pickle
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import LinearSVC
+from sklearn.dummy import DummyClassifier
 from sklearn.model_selection import cross_val_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
@@ -87,16 +88,13 @@ def nfold_cv_dense(category):
   x, y = dataset.load_for_keras()
 
   classes = len(set(y))
-  print 'unique labels in train:', classes
   maxlen = cfg.getint('data', 'maxlen')
   x = pad_sequences(x, maxlen=maxlen)
 
   # make training vectors for target task
-  print 'original x_train shape:', x.shape
   x = interm_layer_model.predict(x)
-  print 'new x_train shape:', x.shape
 
-  classifier = LinearSVC(loss='hinge', class_weight='balanced', C=1)
+  classifier = LinearSVC(class_weight='balanced', C=1)
   cv_scores = cross_val_score(
     classifier,
     x,
