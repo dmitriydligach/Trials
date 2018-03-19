@@ -10,6 +10,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.dummy import DummyClassifier
 from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.metrics import f1_score
@@ -27,6 +28,20 @@ warnings.warn = warn
 
 FEATURE_LIST = 'Model/features.txt'
 NUM_FOLDS = 10
+
+def grid_search(x, y):
+  """Find best model"""
+
+  param_grid = {'C':[0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000]}
+  lr = LogisticRegression(class_weight='balanced')
+  grid_search = GridSearchCV(
+    lr,
+    param_grid,
+    scoring='f1_macro',
+    cv=10)
+  grid_search.fit(x, y)
+
+  return grid_search.best_estimator_
 
 def nfold_cv_sparse(category):
   """Run n-fold CV on training set"""
@@ -53,7 +68,7 @@ def nfold_cv_sparse(category):
   for feature in vectorizer.get_feature_names():
     feature_file.write(feature + '\n')
 
-  classifier = LogisticRegression(class_weight='balanced', C=1)
+  classifier = grid_search(x, y)
   cv_scores = cross_val_score(
     classifier,
     x,
@@ -94,7 +109,7 @@ def nfold_cv_dense(category):
   # make training vectors for target task
   x = interm_layer_model.predict(x)
 
-  classifier = LogisticRegression(class_weight='balanced', C=1)
+  classifier = grid_search(x, y)
   cv_scores = cross_val_score(
     classifier,
     x,
