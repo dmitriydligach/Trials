@@ -46,7 +46,7 @@ def nfold_cv_sparse(category):
   x, y = dataset.load_for_sklearn()
 
   vectorizer = TfidfVectorizer()
-  tfidf_matrix = vectorizer.fit_transform(x)
+  x = vectorizer.fit_transform(x)
 
   # print features to file for debugging
   feature_file = open(cfg.get('model', 'feature_list'), 'w')
@@ -56,7 +56,7 @@ def nfold_cv_sparse(category):
   classifier = LogisticRegression(class_weight='balanced', C=1)
   cv_scores = cross_val_score(
     classifier,
-    tfidf_matrix,
+    x,
     y,
     scoring='f1_macro',
     cv=NUM_FOLDS)
