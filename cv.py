@@ -42,14 +42,14 @@ def nfold_cv_sparse(category):
     cui_dir,
     category,
     use_pickled_alphabet=False,
-    alphabet_pickle=cfg.get('data', 'alphabet_pickle'))
+    alphabet_pickle=cfg.get('model', 'alphabet_pickle'))
   x, y = dataset.load_for_sklearn()
 
   vectorizer = TfidfVectorizer()
   tfidf_matrix = vectorizer.fit_transform(x)
 
   # print features to file for debugging
-  feature_file = open(FEATURE_LIST, 'w')
+  feature_file = open(cfg.get('model', 'feature_list'), 'w')
   for feature in vectorizer.get_feature_names():
     feature_file.write(feature + '\n')
 
