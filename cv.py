@@ -26,7 +26,6 @@ def warn(*args, **kwargs):
 import warnings
 warnings.warn = warn
 
-FEATURE_LIST = 'Model/features.txt'
 NUM_FOLDS = 10
 
 def grid_search(x, y):
