@@ -34,7 +34,7 @@ def grid_search(x, y):
   param_grid = {'C':[0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000],
                 'penalty': ['l1', 'l2'],
                 'class_weight': ['balanced', None]}
-  lr = LogisticRegression(class_weight='balanced')
+  lr = LogisticRegression()
   grid_search = GridSearchCV(
     lr,
     param_grid,
@@ -134,8 +134,8 @@ def nfold_cv_sparse_all():
   for category in n2b2.get_category_names(xml_dir):
 
     # weird sklearn bug - skip for now
-    #if category == 'KETO-1YR':
-    #  continue
+    if category == 'KETO-1YR':
+      continue
 
     if eval_type == 'sparse':
       # use bag-of-word vectors
