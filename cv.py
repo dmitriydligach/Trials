@@ -31,12 +31,14 @@ NUM_FOLDS = 10
 def grid_search(x, y):
   """Find best model"""
 
-  param_grid = {'C':[0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000]}
+  param_grid = {'C':[0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000],
+                'penalty': ['l1', 'l2'],
+                'class_weight': ['balanced', None]}
   lr = LogisticRegression(class_weight='balanced')
   grid_search = GridSearchCV(
     lr,
     param_grid,
-    scoring='f1_macro',
+    scoring='f1_micro',
     cv=10)
   grid_search.fit(x, y)
 
@@ -72,10 +74,10 @@ def nfold_cv_sparse(category):
     classifier,
     x,
     y,
-    scoring='f1_macro',
+    scoring='f1_micro',
     cv=NUM_FOLDS)
 
-  print 'macro f1 (%s) = %.3f' % (category, numpy.mean(cv_scores))
+  print 'micro f1 (%s) = %.3f' % (category, numpy.mean(cv_scores))
   return numpy.mean(cv_scores)
 
 def nfold_cv_dense(category):
@@ -113,10 +115,10 @@ def nfold_cv_dense(category):
     classifier,
     x,
     y,
-    scoring='f1_macro',
+    scoring='f1_micro',
     cv=NUM_FOLDS)
 
-  print 'macro f1 (%s) = %.3f' % (category, numpy.mean(cv_scores))
+  print 'micro f1 (%s) = %.3f' % (category, numpy.mean(cv_scores))
   return numpy.mean(cv_scores)
 
 def nfold_cv_sparse_all():
@@ -132,8 +134,8 @@ def nfold_cv_sparse_all():
   for category in n2b2.get_category_names(xml_dir):
 
     # weird sklearn bug - skip for now
-    if category == 'KETO-1YR':
-      continue
+    #if category == 'KETO-1YR':
+    #  continue
 
     if eval_type == 'sparse':
       # use bag-of-word vectors
@@ -145,7 +147,7 @@ def nfold_cv_sparse_all():
     f1s.append(f1)
 
   print '--------------------------'
-  print 'average macro f1 = %.3f' % numpy.mean(f1s)
+  print 'average micro f1 = %.3f' % numpy.mean(f1s)
 
 if __name__ == "__main__":
 
