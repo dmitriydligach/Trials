@@ -50,12 +50,12 @@ def nfold_cv_sparse(category):
   cfg = ConfigParser.ConfigParser()
   cfg.read(sys.argv[1])
   base = os.environ['DATA_ROOT']
-  xml_dir = os.path.join(base, cfg.get('data', 'xml_dir'))
-  cui_dir = os.path.join(base, cfg.get('data', 'cui_dir'))
+  train_xml_dir = os.path.join(base, cfg.get('data', 'train_xml_dir'))
+  train_cui_dir = os.path.join(base, cfg.get('data', 'train_cui_dir'))
 
   dataset = DatasetProvider(
-    xml_dir,
-    cui_dir,
+    train_xml_dir,
+    train_cui_dir,
     category,
     use_pickled_alphabet=False,
     alphabet_pickle=cfg.get('model', 'alphabet_pickle'))
@@ -86,8 +86,8 @@ def nfold_cv_dense(category):
   cfg = ConfigParser.ConfigParser()
   cfg.read(sys.argv[1])
   base = os.environ['DATA_ROOT']
-  xml_dir = os.path.join(base, cfg.get('data', 'xml_dir'))
-  cui_dir = os.path.join(base, cfg.get('data', 'cui_dir'))
+  train_xml_dir = os.path.join(base, cfg.get('data', 'train_xml_dir'))
+  train_cui_dir = os.path.join(base, cfg.get('data', 'train_cui_dir'))
 
   # load pre-trained model
   model = load_model(cfg.get('data', 'model_file'))
@@ -96,8 +96,8 @@ def nfold_cv_dense(category):
     outputs=model.get_layer('HL').output)
 
   dataset = DatasetProvider(
-    xml_dir,
-    cui_dir,
+    train_xml_dir,
+    train_cui_dir,
     category,
     use_pickled_alphabet=True,
     alphabet_pickle=cfg.get('data', 'alphabet_pickle'))
@@ -128,10 +128,10 @@ def nfold_cv_sparse_all():
   cfg.read(sys.argv[1])
   base = os.environ['DATA_ROOT']
   eval_type = cfg.get('args', 'eval_type')
-  xml_dir = os.path.join(base, cfg.get('data', 'xml_dir'))
+  train_xml_dir = os.path.join(base, cfg.get('data', 'train_xml_dir'))
 
   f1s = []
-  for category in n2b2.get_category_names(xml_dir):
+  for category in n2b2.get_category_names(train_xml_dir):
 
     # weird sklearn bug - skip for now
     if category == 'KETO-1YR':

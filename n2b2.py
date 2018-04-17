@@ -70,7 +70,7 @@ def write_notes_to_files(xml_dir, out_dir):
 
 if __name__ == "__main__":
 
-  xml_dir = '/Users/Dima/Loyola/Data/Trials/Xml/'
-  out_dir = '/Users/Dima/Loyola/Data/Trials/Text/'
+  xml_dir = '/Users/Dima/Loyola/Data/Trials/Test/Xml/'
+  out_dir = '/Users/Dima/Loyola/Data/Trials/Test/Text/'
 
-  generate_dataset_stats(xml_dir)
+  write_notes_to_files(xml_dir, out_dir)
