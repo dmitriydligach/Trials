@@ -9,6 +9,7 @@ import ConfigParser, os, nltk, pandas
 import glob, string, collections, operator
 
 LABEL2INT = {'not met':0, 'met':1}
+INT2LABEL = {0: 'not met', 1: 'met'}
 ALPHABET_FILE = 'Model/alphabet.txt'
 
 class DatasetProvider:
