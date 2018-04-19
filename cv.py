@@ -87,46 +87,6 @@ def nfold_cv_sparse(category):
 
   return numpy.mean(cv_scores)
 
-def predict_sparse(train_xml_dir):
-  """Run n-fold CV on training set"""
-
-  cfg = ConfigParser.ConfigParser()
-  cfg.read(sys.argv[1])
-  base = os.environ['DATA_ROOT']
-  test_xml_dir = os.path.join(base, cfg.get('data', 'test_xml_dir'))
-  test_cui_dir = os.path.join(base, cfg.get('data', 'test_cui_dir'))
-
-  for f in os.listdir(test_cui_dir):
-
-    file_path = os.path.join(test_cui_dir, f)
-    file_as_string = open(file_path).read()
-
-    category2label = {} # key: selection criterion, value: prediction
-    for category in n2b2.get_category_names(train_xml_dir):
-
-      # could not train model; always predict 'not met'
-      if category == 'KETO-1YR':
-        category2label[category] = 'not met'
-        print 'file: %s, crit: %s, label: %s' % (f, category, 'not met')
-        continue
-
-      vectorizer_pickle = 'Model/%s.vec' % category
-      vectorizer = pickle.load(open(vectorizer_pickle, 'rb'))
-      x = vectorizer.transform([file_as_string])
-
-      classifier_pickle = 'Model/%s.clf' % category
-      classifier = pickle.load(open(classifier_pickle, 'rb'))
-      prediction = classifier.predict(x)
-      label = dataset.INT2LABEL[prediction[0]]
-
-      category2label[category] = label
-      print 'file: %s, crit: %s, label: %s' % (f, category, label)
-
-    xml_file_name = f.split('.')[0] + '.xml'
-    xml_file_path = os.path.join(test_xml_dir, xml_file_name)
-    n2b2.write_category_labels(xml_file_path, category2label)
-    print
-
 def nfold_cv_dense(category):
   """Run n-fold CV on training set"""
 
@@ -197,19 +157,6 @@ def nfold_cv_all():
   print '--------------------------'
   print 'average micro f1 = %.3f' % numpy.mean(f1s)
 
-def predict_sparse_all():
-  """Evaluate classifier performance for all 13 conditions"""
-
-  # need train dir to list category names
-  cfg = ConfigParser.ConfigParser()
-  cfg.read(sys.argv[1])
-  base = os.environ['DATA_ROOT']
-  eval_type = cfg.get('args', 'eval_type')
-  train_xml_dir = os.path.join(base, cfg.get('data', 'train_xml_dir'))
-
-  predict_sparse(train_xml_dir)
-
 if __name__ == "__main__":
 
-  # nfold_cv_sparse_all()
-  predict_sparse_all()
+  nfold_cv_all()
