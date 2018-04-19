@@ -168,7 +168,7 @@ def nfold_cv_dense(category):
   print 'micro f1 (%s) = %.3f' % (category, numpy.mean(cv_scores))
   return numpy.mean(cv_scores)
 
-def nfold_cv_sparse_all():
+def nfold_cv_all():
   """Evaluate classifier performance for all 13 conditions"""
 
   # need train dir to list category names
