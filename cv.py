@@ -101,11 +101,13 @@ def predict_sparse(train_xml_dir):
     file_path = os.path.join(test_cui_dir, f)
     file_as_string = open(file_path).read()
 
+    category2label = {} # key: selection criterion, value: prediction
     for category in n2b2.get_category_names(train_xml_dir):
 
       # could not train model; always predict 'not met'
       if category == 'KETO-1YR':
-        print 'file: %s, cat: %s, label: %s' % (f, category, 'not met')
+        category2label[category] = 'not met'
+        print 'file: %s, crit: %s, label: %s' % (f, category, 'not met')
         continue
 
       vectorizer_pickle = 'Model/%s.vec' % category
@@ -117,7 +119,12 @@ def predict_sparse(train_xml_dir):
       prediction = classifier.predict(x)
       label = dataset.INT2LABEL[prediction[0]]
 
-      print 'file: %s, cat: %s, label: %s' % (f, category, label)
+      category2label[category] = label
+      print 'file: %s, crit: %s, label: %s' % (f, category, label)
+
+    xml_file_name = f.split('.')[0] + '.xml'
+    xml_file_path = os.path.join(test_xml_dir, xml_file_name)
+    n2b2.write_category_labels(xml_file_path, category2label)
     print
 
 def nfold_cv_dense(category):
