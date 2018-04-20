@@ -124,8 +124,13 @@ def nfold_cv_dense(category):
     y,
     scoring='f1_micro',
     cv=NUM_FOLDS)
-
   print 'micro f1 (%s) = %.3f' % (category, numpy.mean(cv_scores))
+
+  # train best model on all data and pickle
+  classifier.fit(x, y)
+  classifier_pickle = 'Model/%s.clf' % category
+  pickle.dump(classifier, open(classifier_pickle, 'wb'))
+
   return numpy.mean(cv_scores)
 
 def nfold_cv_all():

@@ -122,6 +122,23 @@ class DatasetProvider:
 
     return examples, labels
 
+def load_one_file_for_keras(file_path, alphabet_pickle):
+  """Convert single example into a list of integers"""
+
+  file_feat_list = open(file_path).read().split()
+
+  pkl = open(alphabet_pickle, 'rb')
+  token2int = pickle.load(pkl)
+
+  example = []
+  for token in set(file_feat_list):
+    if token in token2int:
+      example.append(token2int[token])
+    else:
+      example.append(token2int['oov_word'])
+
+  return example
+
 if __name__ == "__main__":
 
   cfg = ConfigParser.ConfigParser()
