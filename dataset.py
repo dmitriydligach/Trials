@@ -93,6 +93,18 @@ class DatasetProvider:
 
     return examples, labels
 
+def read_tokens(file_path):
+  """Return file as a list of ngrams"""
+
+  text = open(file_path).read().lower()
+
+  tokens = []
+  for token in text.split():
+    if token.isalpha():
+      tokens.append(token)
+
+  return tokens
+  
 def load_one_file_for_keras(file_path, alphabet_pickle):
   """Convert single example into a list of integers"""
 
