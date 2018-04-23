@@ -64,11 +64,6 @@ def nfold_cv_sparse(category):
   vectorizer = TfidfVectorizer()
   x = vectorizer.fit_transform(x)
 
-  # print features to file for debugging
-  feature_file = open(cfg.get('model', 'feature_list'), 'w')
-  for feature in vectorizer.get_feature_names():
-    feature_file.write(feature + '\n')
-
   classifier = grid_search(x, y)
   cv_scores = cross_val_score(
     classifier,

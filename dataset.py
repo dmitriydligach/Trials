@@ -32,38 +32,9 @@ class DatasetProvider:
 
     self.token2int = {}
 
-    # when training, make alphabet and pickle it
-    # when testing, load it from pickle
     if use_pickled_alphabet:
       pkl = open(alphabet_pickle, 'rb')
       self.token2int = pickle.load(pkl)
-    else:
-      self.make_token_alphabet()
-
-  def make_token_alphabet(self):
-    """Map tokens (CUIs) to integers"""
-
-    # count tokens in the entire corpus
-    token_counts = collections.Counter()
-
-    for f in os.listdir(self.cui_dir):
-      file_path = os.path.join(self.cui_dir, f)
-      file_feat_list = open(file_path).read().split()
-      token_counts.update(file_feat_list)
-
-    # now make alphabet (high freq tokens first)
-    index = 1
-    self.token2int['oov_word'] = 0
-    outfile = open(ALPHABET_FILE, 'w')
-    for token, count in token_counts.most_common():
-      if count > self.min_token_freq:
-        outfile.write('%s|%s\n' % (token, count))
-        self.token2int[token] = index
-        index = index + 1
-
-    # pickle alphabet
-    pickle_file = open(self.alphabet_pickle, 'wb')
-    pickle.dump(self.token2int, pickle_file)
 
   def load_for_sklearn(self):
     """Load for sklearn training"""
