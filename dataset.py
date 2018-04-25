@@ -21,7 +21,8 @@ class DatasetProvider:
                category,
                use_pickled_alphabet=False,
                alphabet_pickle=None,
-               min_token_freq=0):
+               min_token_freq=0,
+               use_tokens=False):
     """Index words by frequency in a file"""
 
     self.xml_dir = xml_dir
@@ -29,6 +30,7 @@ class DatasetProvider:
     self.category = category
     self.alphabet_pickle = alphabet_pickle
     self.min_token_freq = min_token_freq
+    self.use_tokens = use_tokens
 
     self.token2int = {}
 
@@ -74,10 +76,16 @@ class DatasetProvider:
     for f in os.listdir(self.cui_dir):
       doc_id = f.split('.')[0]
       file_path = os.path.join(self.cui_dir, f)
-      file_feat_list = open(file_path).read().split()
+
+      if self.use_tokens:
+        # read sequence of tokens from file
+        file_feat_list = read_tokens(file_path)
+      else:
+        # read cuis from file as a set
+        file_feat_list = read_cuis(file_path)
 
       example = []
-      for token in set(file_feat_list):
+      for token in file_feat_list:
         if token in self.token2int:
           example.append(self.token2int[token])
         else:
@@ -93,6 +101,12 @@ class DatasetProvider:
 
     return examples, labels
 
+def read_cuis(file_path):
+  """Get a set of cuis from a file"""
+
+  file_as_string = open(file_path).read()
+  return set(file_as_string.split())
+
 def read_tokens(file_path):
   """Return file as a list of ngrams"""
 
@@ -104,7 +118,7 @@ def read_tokens(file_path):
       tokens.append(token)
 
   return tokens
-  
+
 def load_one_file_for_keras(file_path, alphabet_pickle):
   """Convert single example into a list of integers"""
 
