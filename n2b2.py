@@ -82,6 +82,7 @@ def write_notes_to_files(xml_dir, out_dir):
 
 if __name__ == "__main__":
 
-  xml_dir = '/Users/Dima/Temp/test_xml/'
-  category2label = {'abdominal': 'met', 'alchohol': 'not met'}
-  write_category_labels(xml_dir, '100.xml', category2label)
+  xml_dir = '/Users/Dima/Loyola/Data/Trials/Test/Xml/'
+  txt_dir = '/Users/Dima/Loyola/Data/Trials/Test/Text/'
+  write_notes_to_files(xml_dir, txt_dir)
+  
