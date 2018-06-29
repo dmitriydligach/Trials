@@ -1,11 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 sys.dont_write_bytecode = True
 sys.path.append('../Lib/')
 import n2b2
 import numpy, pickle
-import ConfigParser, os, nltk, pandas
+import configparser, os, nltk, pandas
 import glob, string, collections, operator
 
 LABEL2INT = {'not met':0, 'met':1}
@@ -138,7 +138,7 @@ def load_one_file_for_keras(file_path, alphabet_pickle):
 
 if __name__ == "__main__":
 
-  cfg = ConfigParser.ConfigParser()
+  cfg = configparser.ConfigParser()
   cfg.read(sys.argv[1])
   base = os.environ['DATA_ROOT']
   xml_dir = os.path.join(base, cfg.get('data', 'xml_dir'))
@@ -152,4 +152,4 @@ if __name__ == "__main__":
     alphabet_pickle=cfg.get('data', 'alphabet_pickle'))
 
   x, y = provider.load_for_keras()
-  print x[10]
+  print(x[10])

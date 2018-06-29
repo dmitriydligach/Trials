@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 sys.dont_write_bytecode = True
@@ -11,13 +11,13 @@ def generate_dataset_stats(xml_dir):
 
   for category in get_category_names(xml_dir):
     doc2labels = map_patients_to_labels(xml_dir, category)
-    counts = Counter(doc2labels.values())
+    counts = Counter(list(doc2labels.values()))
     total = len(doc2labels)
     met = counts['met']
-    print 'category:', category.lower()
-    print 'positive prevalence: %.1f%%' % \
-            (met * 100 / float(total))
-    print
+    print('category:', category.lower())
+    print('positive prevalence: %.1f%%' % \
+            (met * 100 / float(total)))
+    print()
 
 def map_patients_to_labels(xml_dir, category):
   """Get a patient number to label mapping"""
@@ -58,7 +58,7 @@ def write_category_labels(xml_file_path, category2label):
   tree = et.parse(xml_file_path)
 
   for tags in tree.iter('TAGS'):
-    for category in category2label.keys():
+    for category in list(category2label.keys()):
       sub = et.SubElement(tags, category)
       sub.set('met', category2label[category])
 

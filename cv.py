@@ -1,11 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import numpy
 numpy.random.seed(0)
 
 import sys
 sys.dont_write_bytecode = True
-import ConfigParser, os, pickle
+import configparser, os, pickle
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.dummy import DummyClassifier
@@ -47,7 +47,7 @@ def grid_search(x, y):
 def nfold_cv_sparse(category):
   """Run n-fold CV on training set"""
 
-  cfg = ConfigParser.ConfigParser()
+  cfg = configparser.ConfigParser()
   cfg.read(sys.argv[1])
   base = os.environ['DATA_ROOT']
   train_xml_dir = os.path.join(base, cfg.get('data', 'train_xml_dir'))
@@ -71,7 +71,7 @@ def nfold_cv_sparse(category):
     y,
     scoring='f1_micro',
     cv=NUM_FOLDS)
-  print 'micro f1 (%s) = %.3f' % (category, numpy.mean(cv_scores))
+  print('micro f1 (%s) = %.3f' % (category, numpy.mean(cv_scores)))
 
   # train best model on all data and pickle
   classifier.fit(x, y)
@@ -85,7 +85,7 @@ def nfold_cv_sparse(category):
 def nfold_cv_dense(category):
   """Run n-fold CV on training set"""
 
-  cfg = ConfigParser.ConfigParser()
+  cfg = configparser.ConfigParser()
   cfg.read(sys.argv[1])
   base = os.environ['DATA_ROOT']
   train_xml_dir = os.path.join(base, cfg.get('data', 'train_xml_dir'))
@@ -119,7 +119,7 @@ def nfold_cv_dense(category):
     y,
     scoring='f1_micro',
     cv=NUM_FOLDS)
-  print 'micro f1 (%s) = %.3f' % (category, numpy.mean(cv_scores))
+  print('micro f1 (%s) = %.3f' % (category, numpy.mean(cv_scores)))
 
   # train best model on all data and pickle
   classifier.fit(x, y)
@@ -132,7 +132,7 @@ def nfold_cv_all():
   """Evaluate classifier performance for all 13 conditions"""
 
   # need train dir to list category names
-  cfg = ConfigParser.ConfigParser()
+  cfg = configparser.ConfigParser()
   cfg.read(sys.argv[1])
   base = os.environ['DATA_ROOT']
   eval_type = cfg.get('args', 'eval_type')
@@ -154,8 +154,8 @@ def nfold_cv_all():
 
     f1s.append(f1)
 
-  print '--------------------------'
-  print 'average micro f1 = %.3f' % numpy.mean(f1s)
+  print('--------------------------')
+  print('average micro f1 = %.3f' % numpy.mean(f1s))
 
 if __name__ == "__main__":
 
