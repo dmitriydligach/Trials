@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
-import numpy
-numpy.random.seed(0)
+import numpy as np
+np.random.seed(0)
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import sys
@@ -61,6 +61,17 @@ def cv_dense(category):
 
   return f1
 
+def cv_hybrid(category):
+  """Run n-fold CV for combined dense and sparse"""
+
+  x_sparse, y = data_sparse(category)
+  x_dense, y = data_dense(category)
+
+  x = np.concatenate((x_dense, x_sparse), axis=1)
+  f1 = cv_and_pickle(x, y, category)
+
+  return f1
+
 def cv_and_pickle(x, y, category):
   """Run n-fold cv and pickle classifier"""
 
@@ -71,14 +82,14 @@ def cv_and_pickle(x, y, category):
     y,
     scoring='f1_micro',
     cv=NUM_FOLDS)
-  print('micro f1 (%s) = %.3f' % (category, numpy.mean(cv_scores)))
+  print('micro f1 (%s) = %.3f' % (category, np.mean(cv_scores)))
 
   # train best model and pickle to use on test set
   classifier.fit(x, y)
   classifier_pickle = 'Model/%s.clf' % category
   pickle.dump(classifier, open(classifier_pickle, 'wb'))
 
-  return numpy.mean(cv_scores)
+  return np.mean(cv_scores)
 
 def data_sparse(category):
   """Get the data and the vectorizer (for pickling)"""
@@ -104,7 +115,7 @@ def data_sparse(category):
   vectorizer_pickle = 'Model/%s.vec' % category
   pickle.dump(vectorizer, open(vectorizer_pickle, 'wb'))
 
-  return x, y
+  return x.toarray(), y
 
 def data_dense(category):
   """Run n-fold CV on training set"""
@@ -158,14 +169,17 @@ def nfold_cv_all():
     if eval_type == 'sparse':
       # use bag-of-word vectors
       f1 = cv_sparse(category)
-    else:
+    elif eval_type == 'dense':
       # use learned patient vectors
       f1 = cv_dense(category)
+    else:
+      # use combined sparse+dense
+      f1 = cv_hybrid(category)
 
     f1s.append(f1)
 
   print('--------------------------')
-  print('average micro f1 = %.3f' % numpy.mean(f1s))
+  print('average micro f1 = %.3f' % np.mean(f1s))
 
 if __name__ == "__main__":
 
