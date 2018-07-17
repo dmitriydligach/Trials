@@ -29,22 +29,6 @@ warnings.warn = warn
 
 NUM_FOLDS = 10
 
-def grid_search(x, y):
-  """Find best model"""
-
-  param_grid = {'C':[0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000],
-                'penalty': ['l1', 'l2'],
-                'class_weight': ['balanced', None]}
-  lr = LogisticRegression()
-  grid_search = GridSearchCV(
-    lr,
-    param_grid,
-    scoring='f1_micro',
-    cv=10)
-  grid_search.fit(x, y)
-
-  return grid_search.best_estimator_
-
 def cv_sparse(category):
   """Run n-fold CV on training set"""
 
@@ -149,6 +133,22 @@ def data_dense(category):
 
   return x, y
 
+def grid_search(x, y):
+  """Find best model"""
+
+  param_grid = {'C':[0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000],
+                'penalty': ['l1', 'l2'],
+                'class_weight': ['balanced', None]}
+  lr = LogisticRegression()
+  grid_search = GridSearchCV(
+    lr,
+    param_grid,
+    scoring='f1_micro',
+    cv=10)
+  grid_search.fit(x, y)
+
+  return grid_search.best_estimator_
+  
 def nfold_cv_all():
   """Evaluate classifier performance for all 13 conditions"""
 
