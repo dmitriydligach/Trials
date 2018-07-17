@@ -71,32 +71,7 @@ def nfold_cv_sparse(category):
 def nfold_cv_dense(category):
   """Run n-fold CV on training set"""
 
-  cfg = configparser.ConfigParser()
-  cfg.read(sys.argv[1])
-  base = os.environ['DATA_ROOT']
-  train_xml_dir = os.path.join(base, cfg.get('data', 'train_xml_dir'))
-  train_cui_dir = os.path.join(base, cfg.get('data', 'train_cui_dir'))
-
-  # load pre-trained model
-  model = load_model(cfg.get('data', 'model_file'))
-  interm_layer_model = Model(
-    inputs=model.input,
-    outputs=model.get_layer('HL').output)
-  maxlen = model.get_layer(name='EL').get_config()['input_length']
-
-  dataset = DatasetProvider(
-    train_xml_dir,
-    train_cui_dir,
-    category,
-    use_pickled_alphabet=True,
-    alphabet_pickle=cfg.get('data', 'alphabet_pickle'))
-  x, y = dataset.load_for_keras()
-
-  classes = len(set(y))
-  x = pad_sequences(x, maxlen=maxlen)
-
-  # make training vectors for target task
-  x = interm_layer_model.predict(x)
+  x, y = data_dense(category)
 
   classifier = grid_search(x, y)
   cv_scores = cross_val_score(
@@ -135,6 +110,38 @@ def data_sparse(category):
   x = vectorizer.fit_transform(x)
 
   return x, y, vectorizer
+
+def data_dense(category):
+  """Run n-fold CV on training set"""
+
+  cfg = configparser.ConfigParser()
+  cfg.read(sys.argv[1])
+  base = os.environ['DATA_ROOT']
+  train_xml_dir = os.path.join(base, cfg.get('data', 'train_xml_dir'))
+  train_cui_dir = os.path.join(base, cfg.get('data', 'train_cui_dir'))
+
+  # load pre-trained model
+  model = load_model(cfg.get('data', 'model_file'))
+  interm_layer_model = Model(
+    inputs=model.input,
+    outputs=model.get_layer('HL').output)
+  maxlen = model.get_layer(name='EL').get_config()['input_length']
+
+  dataset = DatasetProvider(
+    train_xml_dir,
+    train_cui_dir,
+    category,
+    use_pickled_alphabet=True,
+    alphabet_pickle=cfg.get('data', 'alphabet_pickle'))
+  x, y = dataset.load_for_keras()
+
+  classes = len(set(y))
+  x = pad_sequences(x, maxlen=maxlen)
+
+  # make training vectors for target task
+  x = interm_layer_model.predict(x)
+
+  return x, y
 
 def nfold_cv_all():
   """Evaluate classifier performance for all 13 conditions"""
