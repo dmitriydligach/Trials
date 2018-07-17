@@ -45,10 +45,24 @@ def grid_search(x, y):
 
   return grid_search.best_estimator_
 
-def nfold_cv_sparse(category):
+def cv_sparse(category):
   """Run n-fold CV on training set"""
 
   x, y = data_sparse(category)
+  f1 = cv_and_pickle(x, y, category)
+
+  return f1
+
+def cv_dense(category):
+  """Run n-fold CV on training set"""
+
+  x, y = data_dense(category)
+  f1 = cv_and_pickle(x, y, category)
+
+  return f1
+
+def cv_and_pickle(x, y, category):
+  """Run n-fold cv and pickle classifier"""
 
   classifier = grid_search(x, y)
   cv_scores = cross_val_score(
@@ -60,27 +74,6 @@ def nfold_cv_sparse(category):
   print('micro f1 (%s) = %.3f' % (category, numpy.mean(cv_scores)))
 
   # train best model and pickle to use on test set
-  classifier.fit(x, y)
-  classifier_pickle = 'Model/%s.clf' % category
-  pickle.dump(classifier, open(classifier_pickle, 'wb'))
-
-  return numpy.mean(cv_scores)
-
-def nfold_cv_dense(category):
-  """Run n-fold CV on training set"""
-
-  x, y = data_dense(category)
-
-  classifier = grid_search(x, y)
-  cv_scores = cross_val_score(
-    classifier,
-    x,
-    y,
-    scoring='f1_micro',
-    cv=NUM_FOLDS)
-  print('micro f1 (%s) = %.3f' % (category, numpy.mean(cv_scores)))
-
-  # train best model on all data and pickle
   classifier.fit(x, y)
   classifier_pickle = 'Model/%s.clf' % category
   pickle.dump(classifier, open(classifier_pickle, 'wb'))
@@ -164,10 +157,10 @@ def nfold_cv_all():
 
     if eval_type == 'sparse':
       # use bag-of-word vectors
-      f1 = nfold_cv_sparse(category)
+      f1 = cv_sparse(category)
     else:
       # use learned patient vectors
-      f1 = nfold_cv_dense(category)
+      f1 = cv_dense(category)
 
     f1s.append(f1)
 
