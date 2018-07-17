@@ -2,10 +2,11 @@
 
 import numpy
 numpy.random.seed(0)
-
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import sys
 sys.dont_write_bytecode = True
-import configparser, os, pickle
+import configparser, pickle
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.dummy import DummyClassifier
@@ -96,6 +97,7 @@ def nfold_cv_dense(category):
   interm_layer_model = Model(
     inputs=model.input,
     outputs=model.get_layer('HL').output)
+  maxlen = model.get_layer(name='EL').get_config()['input_length']
 
   dataset = DatasetProvider(
     train_xml_dir,
@@ -106,7 +108,6 @@ def nfold_cv_dense(category):
   x, y = dataset.load_for_keras()
 
   classes = len(set(y))
-  maxlen = cfg.getint('data', 'maxlen')
   x = pad_sequences(x, maxlen=maxlen)
 
   # make training vectors for target task
