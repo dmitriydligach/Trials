@@ -48,7 +48,7 @@ def grid_search(x, y):
 def nfold_cv_sparse(category):
   """Run n-fold CV on training set"""
 
-  x, y, vectorizer = data_sparse(category)
+  x, y = data_sparse(category)
 
   classifier = grid_search(x, y)
   cv_scores = cross_val_score(
@@ -59,12 +59,10 @@ def nfold_cv_sparse(category):
     cv=NUM_FOLDS)
   print('micro f1 (%s) = %.3f' % (category, numpy.mean(cv_scores)))
 
-  # train best model on all data and pickle
+  # train best model and pickle to use on test set
   classifier.fit(x, y)
   classifier_pickle = 'Model/%s.clf' % category
-  vectorizer_pickle = 'Model/%s.vec' % category
   pickle.dump(classifier, open(classifier_pickle, 'wb'))
-  pickle.dump(vectorizer, open(vectorizer_pickle, 'wb'))
 
   return numpy.mean(cv_scores)
 
@@ -109,7 +107,11 @@ def data_sparse(category):
   vectorizer = TfidfVectorizer()
   x = vectorizer.fit_transform(x)
 
-  return x, y, vectorizer
+  # pickle to use on test set
+  vectorizer_pickle = 'Model/%s.vec' % category
+  pickle.dump(vectorizer, open(vectorizer_pickle, 'wb'))
+
+  return x, y
 
 def data_dense(category):
   """Run n-fold CV on training set"""
