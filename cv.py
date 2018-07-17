@@ -48,22 +48,7 @@ def grid_search(x, y):
 def nfold_cv_sparse(category):
   """Run n-fold CV on training set"""
 
-  cfg = configparser.ConfigParser()
-  cfg.read(sys.argv[1])
-  base = os.environ['DATA_ROOT']
-  train_xml_dir = os.path.join(base, cfg.get('data', 'train_xml_dir'))
-  train_cui_dir = os.path.join(base, cfg.get('data', 'train_cui_dir'))
-
-  dataset = DatasetProvider(
-    train_xml_dir,
-    train_cui_dir,
-    category,
-    use_pickled_alphabet=False,
-    alphabet_pickle=cfg.get('model', 'alphabet_pickle'))
-  x, y = dataset.load_for_sklearn()
-
-  vectorizer = TfidfVectorizer()
-  x = vectorizer.fit_transform(x)
+  x, y, vectorizer = data_sparse(category)
 
   classifier = grid_search(x, y)
   cv_scores = cross_val_score(
@@ -128,6 +113,28 @@ def nfold_cv_dense(category):
   pickle.dump(classifier, open(classifier_pickle, 'wb'))
 
   return numpy.mean(cv_scores)
+
+def data_sparse(category):
+  """Get the data and the vectorizer (for pickling)"""
+
+  cfg = configparser.ConfigParser()
+  cfg.read(sys.argv[1])
+  base = os.environ['DATA_ROOT']
+  train_xml_dir = os.path.join(base, cfg.get('data', 'train_xml_dir'))
+  train_cui_dir = os.path.join(base, cfg.get('data', 'train_cui_dir'))
+
+  dataset = DatasetProvider(
+    train_xml_dir,
+    train_cui_dir,
+    category,
+    use_pickled_alphabet=False,
+    alphabet_pickle=cfg.get('model', 'alphabet_pickle'))
+  x, y = dataset.load_for_sklearn()
+
+  vectorizer = TfidfVectorizer()
+  x = vectorizer.fit_transform(x)
+
+  return x, y, vectorizer
 
 def nfold_cv_all():
   """Evaluate classifier performance for all 13 conditions"""
