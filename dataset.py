@@ -101,6 +101,32 @@ class DatasetProvider:
 
     return examples, labels
 
+  def load_as_one_hot(self):
+    """Samples as int sequences using keras tokenizer"""
+
+    labels = []    
+    examples = []  
+
+    # document number -> label mapping
+    doc2label = n2b2.map_patients_to_labels(
+      self.xml_dir,
+      self.category)
+
+    # load examples and labels
+    for f in os.listdir(self.cui_dir):
+      doc_id = f.split('.')[0]
+      file_path = os.path.join(self.cui_dir, f)
+      file_feat_list = read_cuis(file_path)
+      examples.append(' '.join(file_feat_list))
+    
+      string_label = doc2label[doc_id]
+      int_label = LABEL2INT[string_label]
+      labels.append(int_label)
+
+    examples = self.token2int.texts_to_matrix(examples, mode='binary')
+
+    return examples, labels  
+
 def read_cuis(file_path):
   """Get a set of cuis from a file"""
 

@@ -56,6 +56,14 @@ def cv_hybrid(category):
 
   return f1
 
+def cv_pretrained(category):
+  """Run n-fold CV using pre-trained representations"""
+
+  x, y = data_pretrained(category)
+  f1 = cv_and_pickle(x, y, category)
+
+  return f1  
+
 def cv_and_pickle(x, y, category):
   """Run n-fold cv and pickle classifier"""
 
@@ -133,6 +141,34 @@ def data_dense(category):
 
   return x, y
 
+def data_pretrained(category):
+  """Run n-fold CV on training set"""
+
+  cfg = configparser.ConfigParser()
+  cfg.read(sys.argv[1])
+  base = os.environ['DATA_ROOT']
+  train_xml_dir = os.path.join(base, cfg.get('data', 'train_xml_dir'))
+  train_cui_dir = os.path.join(base, cfg.get('data', 'train_cui_dir'))
+
+  # load pre-trained model
+  model = load_model(cfg.get('data', 'model_file'))
+  interm_layer_model = Model(
+    inputs=model.input,
+    outputs=model.get_layer('HL').output)
+  
+  dataset = DatasetProvider(
+    train_xml_dir,
+    train_cui_dir,
+    category,
+    use_pickled_alphabet=True,
+    alphabet_pickle=cfg.get('data', 'alphabet_pickle'))
+  x, y = dataset.load_as_one_hot()
+  
+  # make training vectors for target task
+  x = interm_layer_model.predict(x)
+
+  return x, y
+
 def grid_search(x, y):
   """Find best model"""
 
@@ -172,6 +208,9 @@ def nfold_cv_all():
     elif eval_type == 'dense':
       # use learned patient vectors
       f1 = cv_dense(category)
+    elif eval_type == 'pretrained':
+      # use pretrained representations
+      f1 = cv_pretrained(category)
     else:
       # use combined sparse+dense
       f1 = cv_hybrid(category)
